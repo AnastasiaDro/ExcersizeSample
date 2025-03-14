@@ -14,6 +14,7 @@ class ExcersizeFragment : Fragment(R.layout.your_excersize_fragment) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        subscribeToViewModel()
         viewModel.getExcersize()
     }
 

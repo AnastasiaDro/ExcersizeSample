@@ -1,4 +1,4 @@
-package com.cerebus.excersizesample
+package com.cerebus.excersizesample.api
 
 /**
  * если вам тут что-то не хватает - создайте интерфейс и унаследуйтесь от этого,

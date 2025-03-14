@@ -1,7 +1,11 @@
-package com.cerebus.excersizesample
+package com.cerebus.excersizesample.impl
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cerebus.excersizesample.api.ExcersizeData
+import com.cerebus.excersizesample.api.ExcersizeListener
+import com.cerebus.excersizesample.api.ExcersizeProvider
+import com.cerebus.excersizesample.api.ResultValue
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
@@ -13,8 +17,8 @@ class YouExcersizeViewModel : ViewModel() {
     private val excersizeProvider: ExcersizeProvider = YourExcersizeProvider()
 
     /** Через эту подписку вы получаете упражнение **/
-    private val _excersizeSharedFlow: MutableSharedFlow<Excersize> = MutableSharedFlow()
-    val excersizeSharedFlow: SharedFlow<Excersize> = _excersizeSharedFlow
+    private val _excersizeSharedFlow: MutableSharedFlow<ExcersizeData> = MutableSharedFlow()
+    val excersizeSharedFlow: SharedFlow<ExcersizeData> = _excersizeSharedFlow
 
     /** Через эту подписку вы уведомляете View о начале/конце упраджнения **/
     private val _excersizeUpdateStateSharedFlow: MutableSharedFlow<ExcersizeAction> = MutableSharedFlow()

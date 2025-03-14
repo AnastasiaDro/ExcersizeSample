@@ -1,4 +1,4 @@
-package com.cerebus.excersizesample
+package com.cerebus.excersizesample.api
 
 /**
  * FULL_SUCCESS - полный успех, ребенок сделал задание и уложился в желаемое время (successTime)

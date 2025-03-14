@@ -1,10 +1,13 @@
-package com.cerebus.excersizesample
+package com.cerebus.excersizesample.impl
 
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import com.cerebus.excersizesample.R
+import com.cerebus.excersizesample.api.ExcersizeData
+import com.cerebus.excersizesample.api.subscribeToHotFlow
 
 class ExcersizeFragment : Fragment(R.layout.your_excersize_fragment) {
     private val viewModel: YouExcersizeViewModel by viewModels()
@@ -23,7 +26,7 @@ class ExcersizeFragment : Fragment(R.layout.your_excersize_fragment) {
         }
     }
 
-    private fun showExcersize(excersize: Excersize) {
+    private fun showExcersize(excersize: ExcersizeData) {
         //TODO тут показываете
     }
 

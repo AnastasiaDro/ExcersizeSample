@@ -1,6 +1,8 @@
-package com.cerebus.excersizesample
+package com.cerebus.excersizesample.impl
 
 import android.util.Log
+import com.cerebus.excersizesample.api.ExcersizeListener
+import com.cerebus.excersizesample.api.ResultValue
 
 class YourExcersizeListener : ExcersizeListener {
 

@@ -1,4 +1,4 @@
-package com.cerebus.excersizesample
+package com.cerebus.excersizesample.api
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle

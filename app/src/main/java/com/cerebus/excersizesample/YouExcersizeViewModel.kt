@@ -18,14 +18,13 @@ class YouExcersizeViewModel : ViewModel() {
 
     /** Через эту подписку вы уведомляете View о начале/конце упраджнения **/
     private val _excersizeUpdateStateSharedFlow: MutableSharedFlow<ExcersizeAction> = MutableSharedFlow()
-    private val excersizeUpdateStateSharedFlow: SharedFlow<ExcersizeAction> = _excersizeUpdateStateSharedFlow
+    val excersizeUpdateStateSharedFlow: SharedFlow<ExcersizeAction> = _excersizeUpdateStateSharedFlow
 
     fun getExcersize() {
         viewModelScope.launch {
             _excersizeSharedFlow.emit(excersizeProvider.getExcersize())
         }
     }
-
 
     /**
      * ВАЖНО: у Тани будет +- такая функция, у вас может быть другая! Может быть не touched,
@@ -36,11 +35,22 @@ class YouExcersizeViewModel : ViewModel() {
      * @param isTarget - попал ли в шарик
      */
     fun screenWasTouched(x: Float, y: Float, isTarget: Boolean) {
-
+        val result = excersizeListener.userInteracted()
+        if (result == ResultValue.FULL_SUCCESS || result == ResultValue.PART_SUCCESS)
+        viewModelScope.launch {
+            _excersizeUpdateStateSharedFlow.emit(ExcersizeAction.FINISH)
+        }
     }
 }
 
 enum class ExcersizeAction {
     START,
-    FINISH
+    FINISH,
 }
+
+/**
+ * FULL_SUCCESS - полный успех, ребенок сделал задание и уложился в желаемое время (successTime)
+ * PART_SUCCESS - ребенок сделал задание, но не уложился в желаемое время (successTime)
+ * UNSUCCESS - ребенок не сделал задание за ответеденное время вообще
+ * Про время см класс []
+ */

@@ -1,10 +1,10 @@
-package com.cerebus.excersizesample.impl
+package com.cerebus.excersizesample.sliderexerciseimpl
 
 import android.util.Log
 import com.cerebus.excersizesample.api.ExcersizeListener
 import com.cerebus.excersizesample.api.ResultValue
 
-class YourExcersizeListener : ExcersizeListener {
+class SliderExersizeListener : ExcersizeListener {
 
     /**
      * какие-то методы обрабюотки
@@ -17,6 +17,6 @@ class YourExcersizeListener : ExcersizeListener {
 
     /** поменяйте тут тег! **/
     companion object {
-        private const val TAG = "YourExcersizeListener"
+        private const val TAG = "SliderExcersizeListener"
     }
 }

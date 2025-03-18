@@ -1,7 +1,9 @@
 package com.cerebus.excersizesample.balls.presentation
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cerebus.excersizesample.MainActivity
 import com.cerebus.excersizesample.api.ExcersizeData
 import com.cerebus.excersizesample.api.ExcersizeListener
 import com.cerebus.excersizesample.api.ExcersizeProvider
@@ -9,10 +11,14 @@ import com.cerebus.excersizesample.api.ResultValue
 import com.cerebus.excersizesample.impl.YourExcersizeListener
 import com.cerebus.excersizesample.impl.YourExcersizeProvider
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class BallsViewModel : ViewModel() {
+
+class BallsViewModel() : ViewModel() {
 
     //ВАЖНО: в типе - интерфейс, а уже в значении - имлементация! Я потом тут коин подключу
     private val excersizeListener: ExcersizeListener =  YourExcersizeListener()
@@ -47,7 +53,14 @@ class BallsViewModel : ViewModel() {
                 _excersizeUpdateStateSharedFlow.emit(ExcersizeAction.FINISH)
             }
     }
+
+    /////
+    private val _state: MutableStateFlow<State> = MutableStateFlow(State())
+    val state: StateFlow<State> = _state.asStateFlow()
+
+
 }
+
 
 enum class ExcersizeAction {
     START,

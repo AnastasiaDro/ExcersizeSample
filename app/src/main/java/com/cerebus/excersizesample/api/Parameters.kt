@@ -6,4 +6,5 @@ package com.cerebus.excersizesample.api
  * короче все данные, которые нужны для UI
  */
 interface Parameters {
+
 }

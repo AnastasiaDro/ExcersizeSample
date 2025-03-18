@@ -27,8 +27,9 @@ class ExcersizeFragment : Fragment(R.layout.your_excersize_fragment) {
         }
     }
 
+
     private fun showExcersize(excersize: ExcersizeData) {
-        //TODO тут показываете
+
     }
 
     // TODO

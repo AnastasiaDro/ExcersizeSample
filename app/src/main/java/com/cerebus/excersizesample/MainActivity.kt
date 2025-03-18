@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.cerebus.excersizesample.balls.presentation.BallsViewModel
 import com.cerebus.excersizesample.balls.presentation.StepOneScreen
+import com.cerebus.excersizesample.balls.presentation.StepTwoScreen
 import com.cerebus.excersizesample.balls.presentation.StepZeroScreen
 
 class MainActivity : ComponentActivity() {
@@ -15,7 +16,7 @@ class MainActivity : ComponentActivity() {
         viewModel = BallsViewModel()
         enableEdgeToEdge()
 
-        val startStepFromPreferences = 1// это нужно получить из sharedPref
+        val startStepFromPreferences = 2// это нужно получить из sharedPref
 
         setContent {
             when(startStepFromPreferences){
@@ -26,7 +27,7 @@ class MainActivity : ComponentActivity() {
                     StepOneScreen(viewModel)
                 }
                 2 -> {
-
+                    StepTwoScreen(viewModel)
                 }
                 3 -> {
 

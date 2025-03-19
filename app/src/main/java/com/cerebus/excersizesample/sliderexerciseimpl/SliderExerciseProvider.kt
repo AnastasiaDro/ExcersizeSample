@@ -4,7 +4,7 @@ import com.cerebus.excersizesample.api.ExcersizeData
 import com.cerebus.excersizesample.api.ExcersizeProvider
 
 
-class SliderExersizeProvider : ExcersizeProvider {
+class SliderExerciseProvider : ExcersizeProvider {
 
     override fun getExcersize(): ExcersizeData {
         return ExcersizeData(

@@ -30,11 +30,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cerebus.excersizesample.sliderexerciseimpl.sliderapi.SliderParameters
 import kotlin.math.roundToInt
 
 @Composable
 fun SliderExerciseScreen() {
-    val sliderExerciseViewModel: SliderExersizeViewModel = viewModel()
+    val sliderExerciseViewModel: SliderExerciseViewModel = viewModel()
     val sliderType = sliderExerciseViewModel.currentSliderType.value
 
     MaterialTheme {
@@ -48,7 +49,7 @@ fun SliderExerciseScreen() {
                 ToggleSlider(
                     sliderType,
                     modifier = Modifier.padding(innerPadding),
-                    onSliderCompleted = { sliderExerciseViewModel.saveNewStatsAndExit() },
+                    onSliderCompleted = { sliderExerciseViewModel.upgradeToNextSliderType() },
                 )
             }
         }
@@ -57,7 +58,7 @@ fun SliderExerciseScreen() {
 
 @Composable
 fun ToggleSlider(
-    sliderType: SliderType,
+    sliderType: SliderParameters,
     modifier: Modifier,
     onSliderCompleted: () -> Unit
 ) {

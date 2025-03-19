@@ -4,7 +4,7 @@ import android.util.Log
 import com.cerebus.excersizesample.api.ExcersizeListener
 import com.cerebus.excersizesample.api.ResultValue
 
-class SliderExersizeListener : ExcersizeListener {
+class SliderExerciseListener : ExcersizeListener {
 
     /**
      * какие-то методы обрабюотки

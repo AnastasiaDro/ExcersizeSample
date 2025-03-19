@@ -7,14 +7,17 @@ import androidx.lifecycle.viewModelScope
 import com.cerebus.excersizesample.api.ExcersizeData
 import com.cerebus.excersizesample.api.ExcersizeListener
 import com.cerebus.excersizesample.api.ExcersizeProvider
+import com.cerebus.excersizesample.sliderexerciseimpl.sliderapi.ExerciseDataRepository
+import com.cerebus.excersizesample.sliderexerciseimpl.sliderapi.SliderConstants
+import com.cerebus.excersizesample.sliderexerciseimpl.sliderapi.SliderParameters
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 
-class SliderExersizeViewModel : ViewModel() {
+class SliderExerciseViewModel(private val exerciseDataRepository: ExerciseDataRepository) : ViewModel() {
     //ВАЖНО: в типе - интерфейс, а уже в значении - имлементация! Я потом тут коин подключу
-    private val excersizeListener: ExcersizeListener = SliderExersizeListener()
-    private val excersizeProvider: ExcersizeProvider = SliderExersizeProvider()
+    private val excersizeListener: ExcersizeListener = SliderExerciseListener()
+    private val excersizeProvider: ExcersizeProvider = SliderExerciseProvider()
 
     /** Через эту подписку вы получаете упражнение **/
     private val _excersizeSharedFlow: MutableSharedFlow<ExcersizeData> = MutableSharedFlow()
@@ -32,7 +35,7 @@ class SliderExersizeViewModel : ViewModel() {
 
     private val _currentSliderType = mutableStateOf(sliderTypes[SliderTypeName.SHORT]!!)
 
-    val currentSliderType: State<SliderType> = _currentSliderType
+    val currentSliderType: State<SliderParameters> = _currentSliderType
 
     fun setSliderType(typeName: SliderTypeName) {
         _currentSliderType.value = sliderTypes[typeName] ?: sliderTypes[SliderTypeName.SHORT]!!
@@ -44,8 +47,8 @@ class SliderExersizeViewModel : ViewModel() {
             SliderTypeName.SHORT_MOVED -> setSliderType(SliderTypeName.MEDIUM)
             SliderTypeName.MEDIUM -> setSliderType(SliderTypeName.LONG)
             SliderTypeName.LONG -> setSliderType(SliderTypeName.VERTICAL)
-            SliderTypeName.VERTICAL -> setSliderType(SliderTypeName.SLOPING)
-            SliderTypeName.SLOPING -> setSliderType(SliderTypeName.SHORT)
+            SliderTypeName.VERTICAL -> setSliderType(SliderTypeName.ANGLED)
+            SliderTypeName.ANGLED -> setSliderType(SliderTypeName.SHORT)
         }
     }
 
@@ -54,15 +57,13 @@ class SliderExersizeViewModel : ViewModel() {
     }
 }
 
-data class SliderType(val name: SliderTypeName, val length: Int, val angle: Float, val startX: Int, val startY: Int)
-
 private val sliderTypes = mapOf(
-    SliderTypeName.SHORT to SliderType(SliderTypeName.SHORT, 100, 0f, 0, 0),
-    SliderTypeName.SHORT_MOVED to SliderType(SliderTypeName.SHORT_MOVED, 100, 0f, 100, 100),
-    SliderTypeName.MEDIUM to SliderType(SliderTypeName.MEDIUM,150, 0f, 0, 0),
-    SliderTypeName.LONG to SliderType(SliderTypeName.LONG,200, 0f, 0, 0),
-    SliderTypeName.VERTICAL to SliderType(SliderTypeName.VERTICAL,200, 90f, 0, 0),
-    SliderTypeName.SLOPING to SliderType(SliderTypeName.SLOPING,200, 45f, 0, 0)
+    SliderTypeName.SHORT to SliderParameters(SliderTypeName.SHORT, SliderConstants.SLIDER_LENGTH_SHORT, 0f, 0, 0),
+    SliderTypeName.SHORT_MOVED to SliderParameters(SliderTypeName.SHORT_MOVED, SliderConstants.SLIDER_LENGTH_SHORT, 0f, 100, 100),
+    SliderTypeName.MEDIUM to SliderParameters(SliderTypeName.MEDIUM,SliderConstants.SLIDER_LENGTH_MEDIUM, 0f, 0, 0),
+    SliderTypeName.LONG to SliderParameters(SliderTypeName.LONG, SliderConstants.SLIDER_LENGTH_LONG, 0f, 0, 0),
+    SliderTypeName.VERTICAL to SliderParameters(SliderTypeName.VERTICAL,SliderConstants.SLIDER_LENGTH_LONG, 90f, 0, 0),
+    SliderTypeName.ANGLED to SliderParameters(SliderTypeName.ANGLED,SliderConstants.SLIDER_LENGTH_LONG, 45f, 0, 0)
 )
 
 enum class SliderTypeName {
@@ -71,7 +72,7 @@ enum class SliderTypeName {
     MEDIUM,
     LONG,
     VERTICAL,
-    SLOPING
+    ANGLED
 }
 
 

@@ -1,11 +1,10 @@
-package com.cerebus.excersizesample.balls.presentation
+package com.cerebus.excersizesample.balls.presentation.screens
 
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -17,33 +16,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.text.font.FontVariation.width
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import java.nio.file.Files.size
+import com.cerebus.excersizesample.balls.Events
+import com.cerebus.excersizesample.balls.presentation.BallsUiItems
+import com.cerebus.excersizesample.balls.presentation.BallsViewModel
 import kotlin.math.hypot
 import kotlin.random.Random
-import kotlin.times
 
 @Composable
-fun StepOneScreen(viewModel: BallsViewModel) {
-    val circleRadius = 200.0f
-    val circleColor = Color.Yellow
-    val crossColor = Color.Black
-    val crossLength = circleRadius * 1f // Длина линий крестика
-    val crossThickness = 10f // Толщина линий крестика
-
-    ////    val uiState by viewModel.state.collectAsState()
-
+fun StepOneScreen(
+    viewModel: BallsViewModel,
+    ballsUiItems: BallsUiItems = BallsUiItems(
+        circleColor = Color.Yellow
+    )
+) {
+    val state by viewModel.state.collectAsState()
     var isShow by remember { mutableStateOf(true) }
     var circleCenter by remember { mutableStateOf(Offset(0f, 0f)) }
 
     // Функция для генерации случайных координат
     fun generateRandomCenter(width: Float, height: Float): Offset {
-        val randomX = circleRadius + (width - 2 * circleRadius) * Random.nextFloat()
-        val randomY = circleRadius + (height - 2 * circleRadius) * Random.nextFloat()
+        val randomX = ballsUiItems.circleRadius + (width - 2 * ballsUiItems.circleRadius) * Random.nextFloat()
+        val randomY = ballsUiItems.circleRadius + (height - 2 * ballsUiItems.circleRadius) * Random.nextFloat()
         return Offset(randomX, randomY)
     }
 
@@ -57,8 +52,10 @@ fun StepOneScreen(viewModel: BallsViewModel) {
                         tapOffset.x - circleCenter.x,
                         tapOffset.y - circleCenter.y
                     )
-                    if (distance <= circleRadius) {
+                    if (distance <= ballsUiItems.circleRadius) {
                         isShow = false
+                        viewModel.sendEvent(
+                            Events.ChangeData)
                         Log.d("qaz", "pressOne")
                     } else {
                         Log.d("qaz", "mimoOne")
@@ -75,25 +72,25 @@ fun StepOneScreen(viewModel: BallsViewModel) {
                     circleCenter = generateRandomCenter(width, height)
                 }
                 drawCircle(
-                    color = circleColor,
-                    radius = circleRadius,
+                    color = ballsUiItems.circleColor,
+                    radius = ballsUiItems.circleRadius,
                     center = circleCenter
                 )
                 drawLine(
-                    color = crossColor,
-                    start = Offset(circleCenter.x - crossLength / 2,
-                        circleCenter.y - crossLength / 2),
-                    end = Offset(circleCenter.x + crossLength / 2,
-                        circleCenter.y + crossLength / 2),
-                    strokeWidth = crossThickness
+                    color = ballsUiItems.crossColor,
+                    start = Offset(circleCenter.x - ballsUiItems.crossLength / 2,
+                        circleCenter.y - ballsUiItems.crossLength / 2),
+                    end = Offset(circleCenter.x + ballsUiItems.crossLength / 2,
+                        circleCenter.y + ballsUiItems.crossLength / 2),
+                    strokeWidth = ballsUiItems.crossThickness
                 )
                 drawLine(
-                    color = crossColor,
-                    start = Offset(circleCenter.x - crossLength / 2,
-                        circleCenter.y + crossLength / 2),
-                    end = Offset(circleCenter.x + crossLength / 2,
-                        circleCenter.y - crossLength / 2),
-                    strokeWidth = crossThickness
+                    color = ballsUiItems.crossColor,
+                    start = Offset(circleCenter.x - ballsUiItems.crossLength / 2,
+                        circleCenter.y + ballsUiItems.crossLength / 2),
+                    end = Offset(circleCenter.x + ballsUiItems.crossLength / 2,
+                        circleCenter.y - ballsUiItems.crossLength / 2),
+                    strokeWidth = ballsUiItems.crossThickness
                 )
             }
         }
@@ -103,5 +100,7 @@ fun StepOneScreen(viewModel: BallsViewModel) {
 @Preview
 @Composable
 fun PrewSc(){
-    StepOneScreen(viewModel = viewModel())
+    StepOneScreen(viewModel = viewModel(),
+        ballsUiItems = BallsUiItems(circleColor = Color.Red)
+    )
 }

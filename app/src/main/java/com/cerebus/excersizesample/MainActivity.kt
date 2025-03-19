@@ -1,25 +1,29 @@
 package com.cerebus.excersizesample
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import com.cerebus.excersizesample.balls.Events
 import com.cerebus.excersizesample.balls.presentation.BallsViewModel
-import com.cerebus.excersizesample.balls.presentation.StepOneScreen
-import com.cerebus.excersizesample.balls.presentation.StepTwoScreen
-import com.cerebus.excersizesample.balls.presentation.StepZeroScreen
+import com.cerebus.excersizesample.balls.presentation.screens.StepOneScreen
+//import com.cerebus.excersizesample.balls.presentation.screens.StepTwoScreen
+import com.cerebus.excersizesample.balls.presentation.screens.StepZeroScreen
+
 
 class MainActivity : ComponentActivity() {
     private lateinit var viewModel: BallsViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = BallsViewModel()
+        viewModel = BallsViewModel(this)
         enableEdgeToEdge()
-
-        val startStepFromPreferences = 2// это нужно получить из sharedPref
-
+        // Получаем последние параметры игры
+        val lastGameParams = viewModel.getLastGameParams()
+        val difficultLevel: Int = lastGameParams.difficultLevel
+        val step: Int = lastGameParams.step
         setContent {
-            when(startStepFromPreferences){
+            when(step){
                 0 -> {
                     StepZeroScreen(viewModel)
                 }
@@ -27,7 +31,7 @@ class MainActivity : ComponentActivity() {
                     StepOneScreen(viewModel)
                 }
                 2 -> {
-                    StepTwoScreen(viewModel)
+//                    StepTwoScreen(viewModel)
                 }
                 3 -> {
 

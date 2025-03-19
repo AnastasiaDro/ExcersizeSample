@@ -10,7 +10,6 @@ class AllConstants {
             const val TIME_FOR_SUCCESS_STEP_0_1 = 3000L // 3 секунды ? проверить
             const val TIME_FOR_SUCCESS_STEP_2_3 = 4000L // 3 секунды ? проверить
 
-
             // параметра для UI
     }
 }

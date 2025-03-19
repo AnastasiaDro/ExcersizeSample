@@ -1,17 +1,24 @@
-package com.cerebus.excersizesample.impl
+package com.cerebus.excersizesample.balls
 
-import android.annotation.SuppressLint
+import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cerebus.excersizesample.api.ExcersizeData
 import com.cerebus.excersizesample.api.ExcersizeListener
 import com.cerebus.excersizesample.api.ExcersizeProvider
 import com.cerebus.excersizesample.api.ResultValue
+//import com.cerebus.excersizesample.balls.presentation.State
+import com.cerebus.excersizesample.impl.YourExcersizeListener
+import com.cerebus.excersizesample.impl.YourExcersizeProvider
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class YouExcersizeViewModel : ViewModel() {
+
+class BallsViewModel_OLD() : ViewModel() {
 
     //ВАЖНО: в типе - интерфейс, а уже в значении - имлементация! Я потом тут коин подключу
     private val excersizeListener: ExcersizeListener =  YourExcersizeListener()
@@ -42,11 +49,44 @@ class YouExcersizeViewModel : ViewModel() {
     fun screenWasTouched(x: Float, y: Float, isTarget: Boolean) {
         val result = excersizeListener.userInteracted()
         if (result == ResultValue.FULL_SUCCESS || result == ResultValue.PART_SUCCESS)
-        viewModelScope.launch {
-            _excersizeUpdateStateSharedFlow.emit(ExcersizeAction.FINISH)
-        }
+            viewModelScope.launch {
+                _excersizeUpdateStateSharedFlow.emit(ExcersizeAction.FINISH)
+            }
     }
+
+    /////
+//    private val _state: MutableStateFlow<State> = MutableStateFlow(State())
+//    val state: StateFlow<State> = _state.asStateFlow()
+    private val _isBall1Visible = MutableStateFlow(true)
+    val isBall1Visible: StateFlow<Boolean> = _isBall1Visible
+
+    private val _isBall2Visible = MutableStateFlow(true)
+    val isBall2Visible: StateFlow<Boolean> = _isBall2Visible
+
+    private val _ball1Center = MutableStateFlow(Offset(0f, 0f))
+    val ball1Center: StateFlow<Offset> = _ball1Center
+
+    private val _ball2Center = MutableStateFlow(Offset(0f, 0f))
+    val ball2Center: StateFlow<Offset> = _ball2Center
+
+    fun hideBall1() {
+        _isBall1Visible.value = false
+    }
+
+    fun hideBall2() {
+        _isBall2Visible.value = false
+    }
+
+    fun updateBall1Center(newCenter: Offset) {
+        _ball1Center.value = newCenter
+    }
+
+    fun updateBall2Center(newCenter: Offset) {
+        _ball2Center.value = newCenter
+    }
+
 }
+
 
 enum class ExcersizeAction {
     START,

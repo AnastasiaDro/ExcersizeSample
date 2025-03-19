@@ -1,75 +1,61 @@
 package com.cerebus.excersizesample.balls.presentation
 
-import android.annotation.SuppressLint
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.cerebus.excersizesample.MainActivity
-import com.cerebus.excersizesample.api.ExcersizeData
-import com.cerebus.excersizesample.api.ExcersizeListener
-import com.cerebus.excersizesample.api.ExcersizeProvider
-import com.cerebus.excersizesample.api.ResultValue
-import com.cerebus.excersizesample.impl.YourExcersizeListener
-import com.cerebus.excersizesample.impl.YourExcersizeProvider
-import kotlinx.coroutines.flow.MutableSharedFlow
+import com.cerebus.excersizesample.api.ExcersizeType
+import com.cerebus.excersizesample.balls.AllConstants
+import com.cerebus.excersizesample.balls.Events
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import androidx.core.content.edit
+import kotlinx.coroutines.flow.update
 
-
-class BallsViewModel() : ViewModel() {
-
-    //ВАЖНО: в типе - интерфейс, а уже в значении - имлементация! Я потом тут коин подключу
-    private val excersizeListener: ExcersizeListener =  YourExcersizeListener()
-    private val excersizeProvider: ExcersizeProvider = YourExcersizeProvider()
-
-    /** Через эту подписку вы получаете упражнение **/
-    private val _excersizeSharedFlow: MutableSharedFlow<ExcersizeData> = MutableSharedFlow()
-    val excersizeSharedFlow: SharedFlow<ExcersizeData> = _excersizeSharedFlow
-
-    /** Через эту подписку вы уведомляете View о начале/конце упраджнения **/
-    private val _excersizeUpdateStateSharedFlow: MutableSharedFlow<ExcersizeAction> = MutableSharedFlow()
-    val excersizeUpdateStateSharedFlow: SharedFlow<ExcersizeAction> = _excersizeUpdateStateSharedFlow
-
-    fun getExcersize() {
-        viewModelScope.launch {
-            _excersizeSharedFlow.emit(excersizeProvider.getExcersize())
+class BallsViewModel(context: Context) : ViewModel() {
+    private val sharedPreferences = context.getSharedPreferences("GamePreferences", Context.MODE_PRIVATE)
+    private val _state: MutableStateFlow<GameState> = MutableStateFlow(GameState())
+    val state: StateFlow<GameState> = _state.asStateFlow()
+    // Функция для сохранения данных
+    fun saveLastGameParams(params: LastGameParams) {
+        sharedPreferences.edit() {
+            putInt("difficultLevel", params.difficultLevel)
+            putInt("step", params.step)
+            putBoolean("isGameSucceed", params.isGameSucceed)
+            putLong("timeGameFinished", params.timeGameFinished)
+            putInt("gameSucceedTimes", params.gameSucceedTimes)
         }
     }
+    // Функция для получения данных
+    fun getLastGameParams(): LastGameParams {
+        val difficultLevel = sharedPreferences.getInt("difficultLevel", 0)
+        val step = sharedPreferences.getInt("step", 0)
+        val isGameSucceed = sharedPreferences.getBoolean("isGameSucceed", false)
+        val timeGameFinished = sharedPreferences.getLong("timeGameFinished", 0L)
+        val gameSucceedTimes = sharedPreferences.getInt("gameSucceedTimes", 0)
 
-    /**
-     * ВАЖНО: у Тани будет +- такая функция, у вас может быть другая! Может быть не touched,
-     * а там "вышел за границы полоски" или "отпустил во время обводки полоску"
-     * Суть в том, что эта функция - вход в наш "excersizeListener'
-     * @param x - x-координата касания
-     * @param y - y-координата касания
-     * @param isTarget - попал ли в шарик
-     */
-    fun screenWasTouched(x: Float, y: Float, isTarget: Boolean) {
-        val result = excersizeListener.userInteracted()
-        if (result == ResultValue.FULL_SUCCESS || result == ResultValue.PART_SUCCESS)
-            viewModelScope.launch {
-                _excersizeUpdateStateSharedFlow.emit(ExcersizeAction.FINISH)
-            }
+        return LastGameParams(difficultLevel, step, isGameSucceed, timeGameFinished, gameSucceedTimes)
     }
-
-    /////
-    private val _state: MutableStateFlow<State> = MutableStateFlow(State())
-    val state: StateFlow<State> = _state.asStateFlow()
-
-
+    fun sendEvent(event: Events) {
+        when (event) {
+            is Events.GetStep -> {}
+            is Events.BallClicked -> {}
+            is Events.Success -> {}
+            is Events.Lose -> {}
+            is Events.ChangeData -> {
+                val newData = LastGameParams(
+                    step = 1,
+                    difficultLevel = 0
+                )
+                _state.update {
+                    it.copy(
+                        lastGameParams = newData
+                    )
+                }
+                saveLastGameParams(newData)
+            }
+        }
+    }
 }
 
 
-enum class ExcersizeAction {
-    START,
-    FINISH,
-}
-
-/**
- * FULL_SUCCESS - полный успех, ребенок сделал задание и уложился в желаемое время (successTime)
- * PART_SUCCESS - ребенок сделал задание, но не уложился в желаемое время (successTime)
- * UNSUCCESS - ребенок не сделал задание за ответеденное время вообще
- * Про время см класс []
- */

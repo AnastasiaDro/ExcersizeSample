@@ -14,13 +14,13 @@ data class BallsUiItems(
     val crossThickness: Float = 10f, // Толщина линий крестика
 )
 
-
 // GameState - это текущее состояние игры
 data class GameState (
     val difficultLevel: Int = 0, //у каждого упражнения есть сложность, например, тстаичные шарики - это сложность 0,  // двигающиеся - сложность 2
     val step: Int = 0, // шаг во время сложности, то есть 1 шарик - ноль, два шарика - 1, 3 шарика - 2
     val successTime: Long = AllConstants.TIME_FOR_SUCCESS_STEP_0_1, // время в миллисекундах, при котором мы считаем упражнение успешно выполненным FULL_SUCCESS
-    val isShowBall : Boolean = true, // шарик показан или нет
+//    val isShowBall : Boolean = true, // шарик показан или нет
+    val numberOfBalls : Int = 1, // число шариков на экране
     val lastGameParams: LastGameParams = LastGameParams()
 )
 

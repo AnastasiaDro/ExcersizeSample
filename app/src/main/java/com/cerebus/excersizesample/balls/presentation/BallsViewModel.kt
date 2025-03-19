@@ -1,5 +1,7 @@
 package com.cerebus.excersizesample.balls.presentation
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -10,9 +12,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.core.content.edit
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
+import java.lang.Thread.sleep
+import java.nio.channels.ShutdownChannelGroupException
+import kotlin.system.exitProcess
 
-class BallsViewModel(context: Context) : ViewModel() {
+class BallsViewModel(private val context: Context) : ViewModel() {
     private val sharedPreferences = context.getSharedPreferences("GamePreferences", Context.MODE_PRIVATE)
     private val _state: MutableStateFlow<GameState> = MutableStateFlow(GameState())
     val state: StateFlow<GameState> = _state.asStateFlow()
@@ -38,8 +44,15 @@ class BallsViewModel(context: Context) : ViewModel() {
     }
     fun sendEvent(event: Events) {
         when (event) {
-            is Events.GetStep -> {}
-            is Events.BallClicked -> {}
+            is Events.BallClicked -> {
+                /* шарик нажат, проверяем сколько шариков осталось нажать
+                если шариков нет -> то вызыем checkData ()
+                в checkData проверяем  текущие значения игры с референсными 4
+                и выставляем FULL_SUCCESS, UNSUCCESS, или LOSE -> затем
+                ChangeData записываем данные в SharedPref ->
+                затем выходим из игры
+                 */
+            }
             is Events.Success -> {}
             is Events.Lose -> {}
             is Events.ChangeData -> {
@@ -53,6 +66,11 @@ class BallsViewModel(context: Context) : ViewModel() {
                     )
                 }
                 saveLastGameParams(newData)
+                // тут надо выйти из приложения, сохранив всё в sharedPref
+
+                // переписать!
+                (context as? Activity)?.finish() // херня какая-то, но я спать хочу уже
+
             }
         }
     }

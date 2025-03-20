@@ -40,7 +40,8 @@ fun SliderExerciseScreen() {
     val sliderExerciseViewModel: SliderExerciseViewModel = viewModel()
     val screenWidth = with(LocalDensity.current) { LocalConfiguration.current.screenWidthDp }
     val screenHeight = with(LocalDensity.current) { LocalConfiguration.current.screenHeightDp }
-    val sliderType = sliderExerciseViewModel.currentSliderType.value
+//    val sliderType = sliderExerciseViewModel.currentSliderType.value
+    val sliderType = sliderExerciseViewModel.exerciseData.levelData.parameters as SliderParameters
 
     LaunchedEffect(Unit) {
         sliderExerciseViewModel.getScreenSize(screenWidth, screenHeight)
@@ -54,7 +55,7 @@ fun SliderExerciseScreen() {
                     .padding(innerPadding),
                 contentAlignment = Alignment.Center
             ) {
-                ToggleSlider(
+                ChangeableSlider(
                     sliderType,
                     modifier = Modifier.padding(innerPadding),
                     onSliderCompleted = { sliderExerciseViewModel.saveNewStatsAndCloseActivity() },
@@ -65,7 +66,7 @@ fun SliderExerciseScreen() {
 }
 
 @Composable
-fun ToggleSlider(
+fun ChangeableSlider(
     sliderType: SliderParameters,
     modifier: Modifier,
     onSliderCompleted: () -> Unit

@@ -22,6 +22,8 @@ private const val EXERCISE_SUCCESS_TIME = "excersize_success_time"
 private const val IS_SLIDER_IN_PROGRESS = "is_slider_in_progress"
 
 private const val SLIDER_NAME = "slider_name"
+private const val SLIDER_LENGTH = "slider_length"
+private const val SLIDER_ANGLE = "slider_angle"
 private const val SLIDER_START_X = "slider_start_x"
 private const val SLIDER_START_Y = "slider_start_y"
 
@@ -47,6 +49,8 @@ class ExerciseDataRepository(private val sharedPreferences: SharedPreferences) {
             .putLong(EXERCISE_SUCCESS_TIME, excersizeData.levelData.successTime)
 
             .putString(SLIDER_NAME, sliderParameters.name.name)
+            .putInt(SLIDER_LENGTH, sliderParameters.length)
+            .putFloat(SLIDER_ANGLE, sliderParameters.angle)
             .putInt(SLIDER_START_X, sliderParameters.startX)
             .putInt(SLIDER_START_Y, sliderParameters.startY)
         editor.apply()
@@ -71,7 +75,7 @@ class ExerciseDataRepository(private val sharedPreferences: SharedPreferences) {
             successTime = 0,
             parameters = SliderParameters(
                 name = SliderTypeName.SHORT,
-                length = 0,
+                length = 100,
                 angle = 0f,
                 startX = 0,
                 startY = 0
@@ -123,14 +127,15 @@ class ExerciseDataRepository(private val sharedPreferences: SharedPreferences) {
             SliderTypeName.ANGLED.name -> SliderTypeName.VERTICAL
             else -> SliderTypeName.SHORT
         }
-
+        val length = sharedPreferences.getInt(SLIDER_LENGTH, 100)
+        val angle = sharedPreferences.getFloat(SLIDER_ANGLE, 0f)
         val startX = sharedPreferences.getInt(SLIDER_START_X, 0)
         val startY = sharedPreferences.getInt(SLIDER_START_Y, 0)
 
         return SliderParameters(
             name = name,
-            length = 0,
-            angle = 0f,
+            length = length,
+            angle = angle,
             startX = startX,
             startY = startY
         )

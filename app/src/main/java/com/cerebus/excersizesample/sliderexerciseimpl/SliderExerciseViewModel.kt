@@ -38,7 +38,7 @@ class SliderExerciseViewModel(private val exerciseDataRepository: ExerciseDataRe
     private var _currentSliderType = mutableStateOf(sliderTypes[SliderTypeName.SHORT]!!)
     val currentSliderType: State<SliderParameters> = _currentSliderType
 
-    private var exerciseData: ExcersizeData = exerciseDataRepository.getLevel()
+    var exerciseData: ExcersizeData = exerciseDataRepository.getLevel()
 
     private lateinit var screenSize: Pair<Int, Int>
 
@@ -58,10 +58,14 @@ class SliderExerciseViewModel(private val exerciseDataRepository: ExerciseDataRe
     }
 
     fun setRandomStartPosition(width: Int, height: Int): Pair<Int, Int> {
-        val randomStartX = (20..width - 120).random()
-        val randomStartY = (50..height - 50).random()
+        val marginedBoundX = width/2 - 10
+        val marginedBoundY = height/2 - 10
+        val randomStartX = (-marginedBoundX..marginedBoundX).random()
+        val randomStartY = (-marginedBoundY..marginedBoundY).random()
         _currentSliderType.value = _currentSliderType.value.copy(startY = randomStartY, startX = randomStartX)
         return Pair(randomStartX, randomStartY)
+
+//        return Pair(150,100)
     }
 
     fun setAngledSliderType() {
@@ -100,15 +104,18 @@ class SliderExerciseViewModel(private val exerciseDataRepository: ExerciseDataRe
         val newExerciseTimeLimit = exerciseData.excersizeTimeLimit
         var newDifficultLevel = exerciseData.levelData.difficultLevel
         var newStep = 0
+        var newLength = nextSliderType?.length
 
         if (exerciseData.levelData.difficultLevel == 1 && exerciseData.levelData.step < 1) {
             newStep = exerciseData.levelData.step + 1
+            newLength = currentSliderParameters.length
         } else {
             newDifficultLevel++
             newDifficultName = nextSliderType!!.name
         }
         // TODO timer
         val newSuccessTime = 0L
+
 
         // TODO New Coords
         var newStartX = 0
@@ -136,7 +143,9 @@ class SliderExerciseViewModel(private val exerciseDataRepository: ExerciseDataRe
                 parameters = SliderParameters(
                     name = newDifficultName,
                     startX = newStartX,
-                    startY = newStartY
+                    startY = newStartY,
+                    length = newLength ?: 100,
+                    angle = 0f
                 )
             )
         )
@@ -165,13 +174,7 @@ class SliderExerciseViewModel(private val exerciseDataRepository: ExerciseDataRe
 
 private val sliderTypes = mapOf(
     SliderTypeName.SHORT to SliderParameters(SliderTypeName.SHORT, SliderConstants.SLIDER_LENGTH_SHORT, 0f, 0, 0),
-    SliderTypeName.SHORT_MOVED to SliderParameters(
-        SliderTypeName.SHORT_MOVED,
-        SliderConstants.SLIDER_LENGTH_SHORT,
-        0f,
-        100,
-        100
-    ),
+    SliderTypeName.SHORT_MOVED to SliderParameters(SliderTypeName.SHORT_MOVED, SliderConstants.SLIDER_LENGTH_SHORT, 0f, 100, 100),
     SliderTypeName.MEDIUM to SliderParameters(SliderTypeName.MEDIUM,SliderConstants.SLIDER_LENGTH_MEDIUM, 0f, 0, 0),
     SliderTypeName.LONG to SliderParameters(SliderTypeName.LONG, SliderConstants.SLIDER_LENGTH_LONG, 0f, 0, 0),
     SliderTypeName.VERTICAL to SliderParameters(SliderTypeName.VERTICAL,SliderConstants.SLIDER_LENGTH_LONG, 90f, 0, 0),

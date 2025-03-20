@@ -5,8 +5,8 @@ import com.cerebus.excersizesample.sliderexerciseimpl.SliderTypeName
 
 data class SliderParameters(
     val name: SliderTypeName,
-    val length: Int = 0,
-    val angle: Float = 0f,
-    var startX: Int = 0,
-    val startY: Int = 0
+    val length: Int,
+    val angle: Float,
+    var startX: Int,
+    val startY: Int
 ) : Parameters

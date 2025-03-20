@@ -22,12 +22,17 @@ private const val EXERCISE_SUCCESS_TIME = "excersize_success_time"
 private const val IS_SLIDER_IN_PROGRESS = "is_slider_in_progress"
 
 private const val SLIDER_NAME = "slider_name"
+private const val SLIDER_START_X = "slider_start_x"
+private const val SLIDER_START_Y = "slider_start_y"
 
 
 class ExerciseDataRepository(private val sharedPreferences: SharedPreferences) {
 
-    fun saveLevel(excersizeData: ExcersizeData) {
+    fun clearPreferences() {
+        sharedPreferences.edit().clear().apply()
+    }
 
+    fun saveLevel(excersizeData: ExcersizeData) {
         val sliderParameters = excersizeData.levelData.parameters as SliderParameters
 
         val editor = sharedPreferences.edit()
@@ -42,7 +47,17 @@ class ExerciseDataRepository(private val sharedPreferences: SharedPreferences) {
             .putLong(EXERCISE_SUCCESS_TIME, excersizeData.levelData.successTime)
 
             .putString(SLIDER_NAME, sliderParameters.name.name)
+            .putInt(SLIDER_START_X, sliderParameters.startX)
+            .putInt(SLIDER_START_Y, sliderParameters.startY)
         editor.apply()
+    }
+
+    fun getLevel(): ExcersizeData {
+        return if (sharedPreferences.getInt(EXERCISE_NUMBER, -1) == -1) {
+            getInitialLevel()
+        } else {
+            getInProgressLevel()
+        }
     }
 
     fun getInitialLevel(): ExcersizeData = ExcersizeData(
@@ -63,14 +78,6 @@ class ExerciseDataRepository(private val sharedPreferences: SharedPreferences) {
             )
         )
     )
-
-    fun getLevel(): ExcersizeData {
-        return if (sharedPreferences.getInt(EXERCISE_NUMBER, 0) == 0) {
-            getInitialLevel()
-        } else {
-            getInProgressLevel()
-        }
-    }
 
     private fun getInProgressLevel(): ExcersizeData {
         val excersizeType: ExcersizeType = ExcersizeType.DRAG_SLIDER
@@ -117,12 +124,15 @@ class ExerciseDataRepository(private val sharedPreferences: SharedPreferences) {
             else -> SliderTypeName.SHORT
         }
 
+        val startX = sharedPreferences.getInt(SLIDER_START_X, 0)
+        val startY = sharedPreferences.getInt(SLIDER_START_Y, 0)
+
         return SliderParameters(
             name = name,
             length = 0,
             angle = 0f,
-            startX = 0,
-            startY = 0
+            startX = startX,
+            startY = startY
         )
     }
 }

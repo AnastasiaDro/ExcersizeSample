@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.cerebus.excersizesample.api.ExcersizeData
 import com.cerebus.excersizesample.api.ExcersizeListener
 import com.cerebus.excersizesample.api.ExcersizeProvider
+import com.cerebus.excersizesample.api.ExcersizeType
+import com.cerebus.excersizesample.api.LevelData
 import com.cerebus.excersizesample.sliderexerciseimpl.sliderapi.ExerciseDataRepository
 import com.cerebus.excersizesample.sliderexerciseimpl.sliderapi.SliderConstants
 import com.cerebus.excersizesample.sliderexerciseimpl.sliderapi.SliderParameters
@@ -33,33 +35,143 @@ class SliderExerciseViewModel(private val exerciseDataRepository: ExerciseDataRe
         }
     }
 
-    private val _currentSliderType = mutableStateOf(sliderTypes[SliderTypeName.SHORT]!!)
-
+    private var _currentSliderType = mutableStateOf(sliderTypes[SliderTypeName.SHORT]!!)
     val currentSliderType: State<SliderParameters> = _currentSliderType
+
+    private var exerciseData: ExcersizeData = exerciseDataRepository.getLevel()
+
+    private lateinit var screenSize: Pair<Int, Int>
+
+    init {
+        when (exerciseData.levelData.difficultLevel) {
+            0 -> setSliderType(SliderTypeName.SHORT)
+            1 -> setSliderType(SliderTypeName.SHORT_MOVED)
+            2 -> setSliderType(SliderTypeName.MEDIUM)
+            3 -> setSliderType(SliderTypeName.LONG)
+            4 -> setSliderType(SliderTypeName.VERTICAL)
+            5 -> setAngledSliderType()
+        }
+    }
+
+    fun getScreenSize(width: Int, height: Int) {
+        screenSize = Pair(width, height)
+    }
+
+    fun setRandomStartPosition(width: Int, height: Int): Pair<Int, Int> {
+        val randomStartX = (20..width - 120).random()
+        val randomStartY = (50..height - 50).random()
+        _currentSliderType.value = _currentSliderType.value.copy(startY = randomStartY, startX = randomStartX)
+        return Pair(randomStartX, randomStartY)
+    }
+
+    fun setAngledSliderType() {
+        val randomAngle = (0..360).random().toFloat()
+        setSliderType(SliderTypeName.ANGLED)
+        _currentSliderType.value = _currentSliderType.value.copy(angle = randomAngle)
+    }
 
     fun setSliderType(typeName: SliderTypeName) {
         _currentSliderType.value = sliderTypes[typeName] ?: sliderTypes[SliderTypeName.SHORT]!!
     }
 
-    fun upgradeToNextSliderType() {
-        when(currentSliderType.value.name) {
-            SliderTypeName.SHORT -> setSliderType(SliderTypeName.SHORT_MOVED)
-            SliderTypeName.SHORT_MOVED -> setSliderType(SliderTypeName.MEDIUM)
-            SliderTypeName.MEDIUM -> setSliderType(SliderTypeName.LONG)
-            SliderTypeName.LONG -> setSliderType(SliderTypeName.VERTICAL)
-            SliderTypeName.VERTICAL -> setSliderType(SliderTypeName.ANGLED)
-            SliderTypeName.ANGLED -> setSliderType(SliderTypeName.SHORT)
+    fun saveNewStatsAndCloseActivity() {
+        saveNewStats()
+        closeActivity()
+    }
+
+    private fun saveNewStats() {
+        val currentSliderParameters = exerciseData.levelData.parameters as SliderParameters
+        val allTypes = SliderTypeName.values()
+        val currentIndex = allTypes.indexOf(currentSliderParameters.name)
+        var newDifficultName = allTypes[currentIndex]
+
+        // получение следующей сложности
+        val nextSliderType = if (currentIndex in allTypes.indices) {
+            val nextType = allTypes[currentIndex + 1]
+            sliderTypes[nextType]
+        } else {
+            sliderTypes[SliderTypeName.SHORT]
+        }
+
+        //TODO исправить при переходе на следующее упражнение
+        val newExerciseType = ExcersizeType.DRAG_SLIDER
+
+        val newExerciseNumber = exerciseData.excersizeNumber + 1
+        val newExerciseTimeLimit = exerciseData.excersizeTimeLimit
+        var newDifficultLevel = exerciseData.levelData.difficultLevel
+        var newStep = 0
+
+        if (exerciseData.levelData.difficultLevel == 1 && exerciseData.levelData.step < 1) {
+            newStep = exerciseData.levelData.step + 1
+        } else {
+            newDifficultLevel++
+            newDifficultName = nextSliderType!!.name
+        }
+        // TODO timer
+        val newSuccessTime = 0L
+
+        // TODO New Coords
+        var newStartX = 0
+        var newStartY = 0
+        if (exerciseData.levelData.difficultLevel == 0 || exerciseData.levelData.difficultLevel == 1) {
+            if (exerciseData.levelData.step < 1) {
+                val calculation = setRandomStartPosition(screenSize.first, screenSize.second)
+                newStartX = calculation.first
+                newStartY = calculation.second
+            } else {
+                newStartX = 0
+                newStartY = 0
+            }
+        }
+
+        val newExerciseData = ExcersizeData(
+            excersizeType = newExerciseType,
+            excersizeNumber = newExerciseNumber,
+            excersizeTimeLimit = newExerciseTimeLimit,
+            levelData = LevelData(
+                difficultLevel = newDifficultLevel,
+                difficultName = newDifficultName.name,
+                step = newStep,
+                successTime = newSuccessTime,
+                parameters = SliderParameters(
+                    name = newDifficultName,
+                    startX = newStartX,
+                    startY = newStartY
+                )
+            )
+        )
+
+
+        //TODO удалить сброс на последнем уровне
+        if (exerciseData.levelData.difficultLevel == 5) {
+            exerciseDataRepository.clearPreferences()
+        } else {
+            exerciseDataRepository.saveLevel(
+                excersizeData = newExerciseData
+            )
         }
     }
 
-    fun saveNewStatsAndExit() {
+    private val _closeActivityEvent = MutableSharedFlow<Unit>()
+    val closeActivityEvent: SharedFlow<Unit> = _closeActivityEvent
 
+    private fun closeActivity() {
+        viewModelScope.launch {
+            _closeActivityEvent.emit(Unit)
+        }
     }
 }
 
+
 private val sliderTypes = mapOf(
     SliderTypeName.SHORT to SliderParameters(SliderTypeName.SHORT, SliderConstants.SLIDER_LENGTH_SHORT, 0f, 0, 0),
-    SliderTypeName.SHORT_MOVED to SliderParameters(SliderTypeName.SHORT_MOVED, SliderConstants.SLIDER_LENGTH_SHORT, 0f, 100, 100),
+    SliderTypeName.SHORT_MOVED to SliderParameters(
+        SliderTypeName.SHORT_MOVED,
+        SliderConstants.SLIDER_LENGTH_SHORT,
+        0f,
+        100,
+        100
+    ),
     SliderTypeName.MEDIUM to SliderParameters(SliderTypeName.MEDIUM,SliderConstants.SLIDER_LENGTH_MEDIUM, 0f, 0, 0),
     SliderTypeName.LONG to SliderParameters(SliderTypeName.LONG, SliderConstants.SLIDER_LENGTH_LONG, 0f, 0, 0),
     SliderTypeName.VERTICAL to SliderParameters(SliderTypeName.VERTICAL,SliderConstants.SLIDER_LENGTH_LONG, 90f, 0, 0),

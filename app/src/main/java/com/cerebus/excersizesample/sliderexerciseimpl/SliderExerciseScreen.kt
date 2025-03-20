@@ -40,7 +40,6 @@ fun SliderExerciseScreen() {
     val sliderExerciseViewModel: SliderExerciseViewModel = viewModel()
     val screenWidth = with(LocalDensity.current) { LocalConfiguration.current.screenWidthDp }
     val screenHeight = with(LocalDensity.current) { LocalConfiguration.current.screenHeightDp }
-//    val sliderType = sliderExerciseViewModel.currentSliderType.value
     val sliderType = sliderExerciseViewModel.exerciseData.levelData.parameters as SliderParameters
 
     LaunchedEffect(Unit) {
@@ -79,8 +78,6 @@ fun ChangeableSlider(
     val toggleHeight = 40.dp
     val thumbSize = 40.dp
     val toggleRange = with(LocalDensity.current) { (toggleWidth - thumbSize).toPx() }
-
-    val currentSliderType by rememberUpdatedState(sliderType)
 
     Box(
         modifier = Modifier

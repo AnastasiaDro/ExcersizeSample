@@ -12,6 +12,7 @@ import com.cerebus.excersizesample.api.LevelData
 import com.cerebus.excersizesample.sliderexerciseimpl.sliderapi.ExerciseDataRepository
 import com.cerebus.excersizesample.sliderexerciseimpl.sliderapi.SliderConstants
 import com.cerebus.excersizesample.sliderexerciseimpl.sliderapi.SliderParameters
+import com.cerebus.excersizesample.sliderexerciseimpl.sliderapi.SliderTypeName
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
@@ -49,7 +50,7 @@ class SliderExerciseViewModel(private val exerciseDataRepository: ExerciseDataRe
             2 -> setSliderType(SliderTypeName.MEDIUM)
             3 -> setSliderType(SliderTypeName.LONG)
             4 -> setSliderType(SliderTypeName.VERTICAL)
-            5 -> setAngledSliderType()
+            5 -> setSliderType(SliderTypeName.ANGLED)
         }
     }
 
@@ -58,20 +59,15 @@ class SliderExerciseViewModel(private val exerciseDataRepository: ExerciseDataRe
     }
 
     fun setRandomStartPosition(width: Int, height: Int): Pair<Int, Int> {
-        val marginedBoundX = width/2 - 10
-        val marginedBoundY = height/2 - 10
+        val marginedBoundX = width/2 - 60
+        val marginedBoundY = height/2 - 60
         val randomStartX = (-marginedBoundX..marginedBoundX).random()
         val randomStartY = (-marginedBoundY..marginedBoundY).random()
-        _currentSliderType.value = _currentSliderType.value.copy(startY = randomStartY, startX = randomStartX)
         return Pair(randomStartX, randomStartY)
-
-//        return Pair(150,100)
     }
 
-    fun setAngledSliderType() {
-        val randomAngle = (0..360).random().toFloat()
-        setSliderType(SliderTypeName.ANGLED)
-        _currentSliderType.value = _currentSliderType.value.copy(angle = randomAngle)
+    fun setRandomAngle(): Float {
+        return (0..359).random().toFloat()
     }
 
     fun setSliderType(typeName: SliderTypeName) {
@@ -117,7 +113,7 @@ class SliderExerciseViewModel(private val exerciseDataRepository: ExerciseDataRe
         val newSuccessTime = 0L
 
 
-        // TODO New Coords
+        // New Random Coords
         var newStartX = 0
         var newStartY = 0
         if (exerciseData.levelData.difficultLevel == 0 || exerciseData.levelData.difficultLevel == 1) {
@@ -129,6 +125,14 @@ class SliderExerciseViewModel(private val exerciseDataRepository: ExerciseDataRe
                 newStartX = 0
                 newStartY = 0
             }
+        }
+
+        // New random angle
+        var newAngle = 0f
+        if (exerciseData.levelData.difficultLevel == 4) {
+            newAngle = setRandomAngle()
+        } else if (exerciseData.levelData.difficultLevel == 3) {
+            newAngle = 90f
         }
 
         val newExerciseData = ExcersizeData(
@@ -145,11 +149,10 @@ class SliderExerciseViewModel(private val exerciseDataRepository: ExerciseDataRe
                     startX = newStartX,
                     startY = newStartY,
                     length = newLength ?: 100,
-                    angle = 0f
+                    angle =  newAngle
                 )
             )
         )
-
 
         //TODO удалить сброс на последнем уровне
         if (exerciseData.levelData.difficultLevel == 5) {
@@ -171,8 +174,7 @@ class SliderExerciseViewModel(private val exerciseDataRepository: ExerciseDataRe
     }
 }
 
-
-private val sliderTypes = mapOf(
+val sliderTypes = mapOf(
     SliderTypeName.SHORT to SliderParameters(SliderTypeName.SHORT, SliderConstants.SLIDER_LENGTH_SHORT, 0f, 0, 0),
     SliderTypeName.SHORT_MOVED to SliderParameters(SliderTypeName.SHORT_MOVED, SliderConstants.SLIDER_LENGTH_SHORT, 0f, 100, 100),
     SliderTypeName.MEDIUM to SliderParameters(SliderTypeName.MEDIUM,SliderConstants.SLIDER_LENGTH_MEDIUM, 0f, 0, 0),
@@ -180,16 +182,6 @@ private val sliderTypes = mapOf(
     SliderTypeName.VERTICAL to SliderParameters(SliderTypeName.VERTICAL,SliderConstants.SLIDER_LENGTH_LONG, 90f, 0, 0),
     SliderTypeName.ANGLED to SliderParameters(SliderTypeName.ANGLED,SliderConstants.SLIDER_LENGTH_LONG, 45f, 0, 0)
 )
-
-enum class SliderTypeName {
-    SHORT,
-    SHORT_MOVED,
-    MEDIUM,
-    LONG,
-    VERTICAL,
-    ANGLED
-}
-
 
 enum class ExcersizeAction {
     START,

@@ -7,3 +7,14 @@ object SliderConstants {
 
     const val EXERCISE_TIME_LIMIT: Long = 20000
 }
+
+enum class SliderTypeName {
+    SHORT,
+    SHORT_MOVED,
+    MEDIUM,
+    LONG,
+    VERTICAL,
+    ANGLED
+}
+
+

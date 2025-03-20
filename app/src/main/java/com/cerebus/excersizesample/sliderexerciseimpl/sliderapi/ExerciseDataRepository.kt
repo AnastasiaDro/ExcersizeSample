@@ -4,7 +4,6 @@ import android.content.SharedPreferences
 import com.cerebus.excersizesample.api.ExcersizeData
 import com.cerebus.excersizesample.api.ExcersizeType
 import com.cerebus.excersizesample.api.LevelData
-import com.cerebus.excersizesample.sliderexerciseimpl.SliderTypeName
 
 /*
 * Использую для доступа к SharedPreferences

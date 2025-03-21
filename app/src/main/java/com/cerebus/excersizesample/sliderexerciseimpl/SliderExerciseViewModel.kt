@@ -59,7 +59,8 @@ class SliderExerciseViewModel(private val exerciseDataRepository: ExerciseDataRe
     }
 
     fun setRandomStartPosition(width: Int, height: Int): Pair<Int, Int> {
-        val marginedBoundX = width/2 - 60
+        // Отодвинуть от краёв
+        val marginedBoundX = width/2 - 80
         val marginedBoundY = height/2 - 60
         val randomStartX = (-marginedBoundX..marginedBoundX).random()
         val randomStartY = (-marginedBoundY..marginedBoundY).random()
@@ -127,7 +128,7 @@ class SliderExerciseViewModel(private val exerciseDataRepository: ExerciseDataRe
             }
         }
 
-        // New random angle
+        // New angle
         var newAngle = 0f
         if (exerciseData.levelData.difficultLevel == 4) {
             newAngle = setRandomAngle()

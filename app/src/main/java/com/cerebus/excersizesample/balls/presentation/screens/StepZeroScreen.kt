@@ -33,42 +33,11 @@ fun StepZeroScreen(
     viewModel: BallsViewModel,
     ballsUiItems: BallsUiItems = BallsUiItems(circleColor = Color.Red)
 ) {
-    val state by viewModel.state.collectAsState()
     var isShow by remember { mutableStateOf(true) }
-
-    var isShowCurrentInfo by remember { mutableStateOf(true) }
-    var isShowInfoForSharedPref by remember { mutableStateOf(false) }
-
     LaunchedEffect(Unit) {
         Log.d("qaz", "showBall")
         viewModel.updateStartTime(System.currentTimeMillis())
     }
-
-    if (isShowCurrentInfo) {
-        Box(modifier = Modifier.padding(240.dp)) {
-            Column {
-                Text("Это текущая инфа:")
-                Text("уровень сложности (0 - статика, 2 - движ) difficultLevel: ${state.lastGameParams.difficultLevel}")
-                Text("Шаг сложности step: ${state.lastGameParams.step}")
-                Text("ResultValue: ${state.lastGameParams.isGameSucceedStatus}")
-                Text("время за сколько завершен уровень: ${state.lastGameParams.timeGameFinished}")
-                Text("время, когда последний раз сыграли: ${state.lastGameParams.lastSucceedTime}")
-            }
-        }
-    }
-    if (isShowInfoForSharedPref) {
-        Box(modifier = Modifier.padding(40.dp)) {
-            Column {
-                Text("Это сохраняем в sharedPref:")
-                Text("уровень сложности (0 - статика, 2 - движ) difficultLevel: ${state.lastGameParams.difficultLevel}")
-                Text("Шаг сложности step: ${state.lastGameParams.step}")
-                Text("ResultValue: ${state.lastGameParams.isGameSucceedStatus}")
-                Text("время за сколько завершен уровень: ${state.lastGameParams.timeGameFinished}")
-                Text("время, когда последний раз сыграли: ${state.lastGameParams.lastSucceedTime}")
-            }
-        }
-    }
-
 
     Box(
         modifier = Modifier
@@ -87,7 +56,6 @@ fun StepZeroScreen(
                     if (distance <= ballsUiItems.circleRadius) {
                         isShow = false
                         viewModel.ballClicked()
-                        isShowInfoForSharedPref = true
                     }
                 }
             },
@@ -130,52 +98,4 @@ fun StepZeroScreen(
         }
     }
 }
-
-
-//
-//@Composable
-//fun StepZeroScreen(
-//    viewModel: BallsViewModel,
-//    ballsUiItems: BallsUiItems = BallsUiItems(circleColor = Color.Red)
-//) {
-//    var isShow by remember { mutableStateOf(true) }
-//    LaunchedEffect(Unit) {
-//        Log.d("qaz", "showBall")
-//        viewModel.updateStartTime(System.currentTimeMillis())
-//    }
-//    Box(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .pointerInput(Unit) {
-//                detectTapGestures { tapOffset ->
-//                    // Вычисляем центр экрана
-//                    val centerX = size.width / 2
-//                    val centerY = size.height / 2
-//                    // Вычисляем расстояние между точкой касания и центром круга
-//                    val distance = hypot(
-//                        tapOffset.x - centerX,
-//                        tapOffset.y - centerY
-//                    )
-//                    // Проверяем, находится ли точка касания внутри круга
-//                    if (distance <= ballsUiItems.circleRadius) {
-//                        isShow = false
-//                        viewModel.sendEvent(Events.ChangeData)
-//                    }
-//                }
-//            },
-//        contentAlignment = Alignment.Center
-//    ) {
-//        if (isShow == true) {
-//            Canvas(modifier = Modifier.fillMaxWidth()) {
-//                val centerX = size.width / 2
-//                val centerY = size.height / 2
-//                drawCircle(
-//                    color = ballsUiItems.circleColor,
-//                    radius = ballsUiItems.circleRadius,
-//                    center = Offset(size.width / 2, size.height / 2)
-//                )
-//            }
-//        }
-//    }
-//}
 

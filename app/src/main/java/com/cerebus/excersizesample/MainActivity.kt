@@ -2,6 +2,7 @@ package com.cerebus.excersizesample
 
 //import com.cerebus.excersizesample.balls.presentation.screens.StepTwoScreen
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -21,13 +22,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         viewModel = BallsViewModel(this)
         enableEdgeToEdge()
-//        lifecycleScope.launch {
-//            repeatOnLifecycle(Lifecycle.State.STARTED) {
-//                viewModel..collect {
-//                    finish()
-//                }
-//            }
-//        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.closeActivityEvent.collect {
+                    finish()
+                }
+            }
+        }
         // Получаем последние параметры игры
         val lastGameParams = viewModel.getLastGameParams()
         var step = if (lastGameParams.isGameSucceedStatus == ResultValue.FULL_SUCCESS) {
@@ -38,19 +39,16 @@ class MainActivity : ComponentActivity() {
         setContent {
             when (step) {
                 0 -> {
-                    viewModel.levelDataUpdate(0) // тут обновление параметров для текущего уровня
-                    StepZeroScreen(viewModel)
-                }
-
+                    viewModel.levelDataUpdate(0)
+                    StepZeroScreen(viewModel) }
                 1 -> {
                     viewModel.levelDataUpdate(1)
                     StepOneScreen(viewModel)
                 }
-
                 2 -> {
+                    Log.d("qaz", "2 'экран")
 //                    StepTwoScreen(viewModel)
                 }
-
                 3 -> {
 
                 }

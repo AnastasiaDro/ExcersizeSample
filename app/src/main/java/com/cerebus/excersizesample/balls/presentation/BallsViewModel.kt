@@ -1,26 +1,38 @@
 package com.cerebus.excersizesample.balls.presentation
 
-import android.app.Activity
 import android.content.Context
 import android.util.Log
+import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.cerebus.excersizesample.api.ResultValue
 import com.cerebus.excersizesample.balls.AllConstants
-
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import androidx.core.content.edit
-import com.cerebus.excersizesample.api.ResultValue
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class BallsViewModel(private val context: Context) : ViewModel() {
-    private val sharedPreferences = context.getSharedPreferences("GamePreferences", Context.MODE_PRIVATE)
+    private val sharedPreferences =
+        context.getSharedPreferences("GamePreferences", Context.MODE_PRIVATE)
     private val _state: MutableStateFlow<GameState> = MutableStateFlow(GameState())
     val state: StateFlow<GameState> = _state.asStateFlow()
 
+    private val _closeActivityEvent = MutableSharedFlow<Unit>()
+    val closeActivityEvent: SharedFlow<Unit> = _closeActivityEvent
+
+    private fun closeActivity() {
+        viewModelScope.launch {
+            _closeActivityEvent.emit(Unit)
+        }
+    }
+
     // Функция для сохранения данных в sharedPref
     fun saveLastGameParams(params: LastGameParams) {
-        sharedPreferences.edit() {
+        sharedPreferences.edit {
             putInt("difficultLevel", params.difficultLevel)
             putInt("step", params.step)
             putString("isGameSucceedStatus", params.isGameSucceedStatus.name)
@@ -28,52 +40,57 @@ class BallsViewModel(private val context: Context) : ViewModel() {
             putLong("lastSucceedTime", params.lastSucceedTime)
         }
     }
+
     // Функция для получения данных
     fun getLastGameParams(): LastGameParams {
         val difficultLevel = sharedPreferences.getInt("difficultLevel", 0)
         val step = sharedPreferences.getInt("step", 0)
-        val isGameSucceedStatusString = sharedPreferences.getString("isGameSucceedStatus", ResultValue.UNSUCCESS.name)
-        val isGameSucceedStatus = ResultValue.valueOf(isGameSucceedStatusString ?: ResultValue.UNSUCCESS.name)
+        val isGameSucceedStatusString =
+            sharedPreferences.getString("isGameSucceedStatus", ResultValue.UNSUCCESS.name)
+        val isGameSucceedStatus =
+            ResultValue.valueOf(isGameSucceedStatusString ?: ResultValue.UNSUCCESS.name)
         val timeGameFinished = sharedPreferences.getLong("timeGameFinished", 0L)
         val lastSucceedTime = sharedPreferences.getLong("lastSucceedTime", 0L)
-        return LastGameParams(difficultLevel, step, isGameSucceedStatus, timeGameFinished, lastSucceedTime)
+        return LastGameParams(
+            difficultLevel,
+            step,
+            isGameSucceedStatus,
+            timeGameFinished,
+            lastSucceedTime
+        )
     }
 
     fun updateStartTime(currentTime: Long) {
         _state.value = _state.value.copy(startTime = currentTime)
     }
 
-    fun  checkTimeSuccess() : Boolean{
+    fun checkTimeSuccess(): Boolean {
         val currentTime = System.currentTimeMillis()
         val finishTime = currentTime - _state.value.startTime
         _state.update { it.copy(timeGameFinished = finishTime) }
         return finishTime <= state.value.successTime
     }
 
-
-    fun changeDataInSharedPref(){
+    fun changeDataInSharedPref() {
         val newData = LastGameParams(
-                    difficultLevel = state.value.difficultLevel,
-                    step = state.value.step,
-                    isGameSucceedStatus = state.value.gameResultValue,
-                    lastSucceedTime = System.currentTimeMillis(),
-                    timeGameFinished = state.value.timeGameFinished
-                )
-
-        updateDataForScreen() // тут обновляем через state, чтобы отобразить на экране
+            difficultLevel = state.value.difficultLevel,
+            step = state.value.step,
+            isGameSucceedStatus = state.value.gameResultValue,
+            lastSucceedTime = System.currentTimeMillis(),
+            timeGameFinished = state.value.timeGameFinished
+        )
         saveLastGameParams(newData)
     }
 
-    fun endOfZeroLevel() {
+    fun endOfZeroAndOneLevel() {
         val levelFinishedInTime = checkTimeSuccess()
-        if (levelFinishedInTime){
+        if (levelFinishedInTime) {
             _state.update {
                 it.copy(
                     gameResultValue = ResultValue.FULL_SUCCESS,
                 )
             }
-        }
-        else{
+        } else {
             _state.update {
                 it.copy(
                     gameResultValue = ResultValue.PART_SUCCESS,
@@ -81,19 +98,17 @@ class BallsViewModel(private val context: Context) : ViewModel() {
             }
         }
         changeDataInSharedPref()
-
     }
 
-    fun endOfOneLevel(){
+    fun endOfOneLevel() {
         val levelFinishedInTime = checkTimeSuccess()
-        if (levelFinishedInTime){
+        if (levelFinishedInTime) {
             _state.update {
                 it.copy(
                     gameResultValue = ResultValue.FULL_SUCCESS,
                 )
             }
-        }
-        else{
+        } else {
             _state.update {
                 it.copy(
                     gameResultValue = ResultValue.PART_SUCCESS,
@@ -101,23 +116,28 @@ class BallsViewModel(private val context: Context) : ViewModel() {
             }
         }
         changeDataInSharedPref()
-
+        closeActivity()
     }
 
 
-    fun ballClicked(){
+    fun ballClicked() {
         /*тут считаем количество шариков
         если все шарики нажаты едем дальше
          */
 
         // if (шариков нет)
-        when(state.value.step){
-            0 -> { endOfZeroLevel() }
-            1 -> { endOfOneLevel() }
-            2-> {}
+        when (state.value.step) {
+            0 -> {
+                endOfZeroAndOneLevel()
+            }
+            1 -> {
+                endOfZeroAndOneLevel()
+            }
+
+            2 -> {}
             3 -> {}
         }
-
+        closeActivity()
         // переписать завершение активити!!
 //                (context as? Activity)?.finish() // херня какая-то, но я спать хочу уже
 
@@ -130,9 +150,10 @@ class BallsViewModel(private val context: Context) : ViewModel() {
      */
     }
 
-    fun levelDataUpdate(level : Int){
-        when(level){
-            0 -> { _state.update {
+    fun levelDataUpdate(level: Int) {
+        when (level) {
+            0 -> {
+                _state.update {
                     it.copy(
                         difficultLevel = 0,
                         difficultName = "Static",
@@ -143,6 +164,7 @@ class BallsViewModel(private val context: Context) : ViewModel() {
                     )
                 }
             }
+
             1 -> {
                 _state.update {
                     it.copy(
@@ -155,6 +177,7 @@ class BallsViewModel(private val context: Context) : ViewModel() {
                     )
                 }
             }
+
             2 -> {
                 _state.update {
                     it.copy(
@@ -167,6 +190,7 @@ class BallsViewModel(private val context: Context) : ViewModel() {
                     )
                 }
             }
+
             3 -> {
                 _state.update {
                     it.copy(
@@ -180,20 +204,9 @@ class BallsViewModel(private val context: Context) : ViewModel() {
                 }
             }
         }
-        Log.d("qaz", "GameData For level ${state.value.step}: " +
-                "sucTime : ${state.value.successTime}, ballsAll: ${state.value.numberBallsAll} ")
+        Log.d(
+            "qaz", "GameData For level ${state.value.step}: " +
+                    "sucTime : ${state.value.successTime}, ballsAll: ${state.value.numberBallsAll} "
+        )
     }
-
-    fun updateDataForScreen(){
-        _state.update { it.copy(
-            lastGameParams = LastGameParams(
-                difficultLevel = state.value.difficultLevel,
-                step = state.value.step,
-                isGameSucceedStatus = state.value.gameResultValue,
-                lastSucceedTime = System.currentTimeMillis(),
-                timeGameFinished = state.value.timeGameFinished,
-            )
-        ) }
-    }
-
 }

@@ -5,10 +5,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.cerebus.excersizesample.api.ResultValue
 import com.cerebus.excersizesample.balls.presentation.BallsViewModel
 import com.cerebus.excersizesample.balls.presentation.screens.StepOneScreen
 import com.cerebus.excersizesample.balls.presentation.screens.StepZeroScreen
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
@@ -17,6 +21,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         viewModel = BallsViewModel(this)
         enableEdgeToEdge()
+//        lifecycleScope.launch {
+//            repeatOnLifecycle(Lifecycle.State.STARTED) {
+//                viewModel..collect {
+//                    finish()
+//                }
+//            }
+//        }
         // Получаем последние параметры игры
         val lastGameParams = viewModel.getLastGameParams()
         var step = if (lastGameParams.isGameSucceedStatus == ResultValue.FULL_SUCCESS) {

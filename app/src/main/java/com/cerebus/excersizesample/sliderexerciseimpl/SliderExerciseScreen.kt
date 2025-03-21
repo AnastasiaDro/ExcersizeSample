@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cerebus.excersizesample.api.ResultValue
 import com.cerebus.excersizesample.sliderexerciseimpl.sliderapi.SliderParameters
 import kotlin.math.roundToInt
 
@@ -44,6 +45,7 @@ fun SliderExerciseScreen() {
 
     LaunchedEffect(Unit) {
         sliderExerciseViewModel.getScreenSize(screenWidth, screenHeight)
+        sliderExerciseViewModel.startTimer()
     }
 
     MaterialTheme {
@@ -57,7 +59,7 @@ fun SliderExerciseScreen() {
                 ChangeableSlider(
                     sliderType,
                     modifier = Modifier.padding(innerPadding),
-                    onSliderCompleted = { sliderExerciseViewModel.saveNewStatsAndCloseActivity() },
+                    onSliderCompleted = { sliderExerciseViewModel.saveNewStatsAndCloseActivity(ResultValue.FULL_SUCCESS) },
                 )
             }
         }
@@ -67,7 +69,7 @@ fun SliderExerciseScreen() {
 @Composable
 fun ChangeableSlider(
     sliderType: SliderParameters,
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     onSliderCompleted: () -> Unit
 ) {
     var offsetX by remember { mutableStateOf(0f) }
@@ -129,7 +131,7 @@ fun ChangeableSlider(
                     .size(thumbSize)
                     .clip(CircleShape)
                     .background(Color(0xff74d476))
-                    .border(4.dp, Color(0xffcbf0ce), CircleShape)
+                    .border(2.dp, Color(0xffcbf0ce), CircleShape)
             )
         }
     }

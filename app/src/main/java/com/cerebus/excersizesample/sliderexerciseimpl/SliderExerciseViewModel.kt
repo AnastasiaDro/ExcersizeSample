@@ -5,43 +5,47 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cerebus.excersizesample.api.ExcersizeData
-import com.cerebus.excersizesample.api.ExcersizeListener
-import com.cerebus.excersizesample.api.ExcersizeProvider
 import com.cerebus.excersizesample.api.ExcersizeType
 import com.cerebus.excersizesample.api.LevelData
+import com.cerebus.excersizesample.api.ResultValue
 import com.cerebus.excersizesample.sliderexerciseimpl.sliderapi.ExerciseDataRepository
 import com.cerebus.excersizesample.sliderexerciseimpl.sliderapi.SliderConstants
 import com.cerebus.excersizesample.sliderexerciseimpl.sliderapi.SliderParameters
 import com.cerebus.excersizesample.sliderexerciseimpl.sliderapi.SliderTypeName
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 
 class SliderExerciseViewModel(private val exerciseDataRepository: ExerciseDataRepository) : ViewModel() {
-    //ВАЖНО: в типе - интерфейс, а уже в значении - имлементация! Я потом тут коин подключу
-    private val excersizeListener: ExcersizeListener = SliderExerciseListener()
-    private val excersizeProvider: ExcersizeProvider = SliderExerciseProvider()
-
-    /** Через эту подписку вы получаете упражнение **/
-    private val _excersizeSharedFlow: MutableSharedFlow<ExcersizeData> = MutableSharedFlow()
-    val excersizeSharedFlow: SharedFlow<ExcersizeData> = _excersizeSharedFlow
-
-    /** Через эту подписку вы уведомляете View о начале/конце упраджнения **/
-    private val _excersizeUpdateStateSharedFlow: MutableSharedFlow<ExcersizeAction> = MutableSharedFlow()
-    val excersizeUpdateStateSharedFlow: SharedFlow<ExcersizeAction> = _excersizeUpdateStateSharedFlow
-
-    fun getExcersize() {
-        viewModelScope.launch {
-            _excersizeSharedFlow.emit(excersizeProvider.getExcersize())
-        }
-    }
+//    //ВАЖНО: в типе - интерфейс, а уже в значении - имлементация! Я потом тут коин подключу
+//    private val excersizeListener: ExcersizeListener = SliderExerciseListener()
+//    private val excersizeProvider: ExcersizeProvider = SliderExerciseProvider()
+//
+//    /** Через эту подписку вы получаете упражнение **/
+//    private val _excersizeSharedFlow: MutableSharedFlow<ExcersizeData> = MutableSharedFlow()
+//    val excersizeSharedFlow: SharedFlow<ExcersizeData> = _excersizeSharedFlow
+//
+//    /** Через эту подписку вы уведомляете View о начале/конце упраджнения **/
+//    private val _excersizeUpdateStateSharedFlow: MutableSharedFlow<ExcersizeAction> = MutableSharedFlow()
+//    val excersizeUpdateStateSharedFlow: SharedFlow<ExcersizeAction> = _excersizeUpdateStateSharedFlow
+//
+//    fun getExcersize() {
+//        viewModelScope.launch {
+//            _excersizeSharedFlow.emit(excersizeProvider.getExcersize())
+//        }
+//    }
 
     private var _currentSliderType = mutableStateOf(sliderTypes[SliderTypeName.SHORT]!!)
     val currentSliderType: State<SliderParameters> = _currentSliderType
 
     var exerciseData: ExcersizeData = exerciseDataRepository.getLevel()
-
     private lateinit var screenSize: Pair<Int, Int>
+
+    private var timerJob: Job? = null
+    private var startTime: Long = 0
+    private var endTime: Long = 0
 
     init {
         when (exerciseData.levelData.difficultLevel) {
@@ -75,8 +79,11 @@ class SliderExerciseViewModel(private val exerciseDataRepository: ExerciseDataRe
         _currentSliderType.value = sliderTypes[typeName] ?: sliderTypes[SliderTypeName.SHORT]!!
     }
 
-    fun saveNewStatsAndCloseActivity() {
-        saveNewStats()
+    fun saveNewStatsAndCloseActivity(resultValue: ResultValue) {
+        if (resultValue == ResultValue.FULL_SUCCESS) {
+            saveNewStats()
+            timerJob?.cancel()
+        }
         closeActivity()
     }
 
@@ -94,7 +101,7 @@ class SliderExerciseViewModel(private val exerciseDataRepository: ExerciseDataRe
             sliderTypes[SliderTypeName.SHORT]
         }
 
-        //TODO исправить при переходе на следующее упражнение
+        //TODO исправить при переходе на следующий вид упражнений (точки и проч.)
         val newExerciseType = ExcersizeType.DRAG_SLIDER
 
         val newExerciseNumber = exerciseData.excersizeNumber + 1
@@ -102,6 +109,7 @@ class SliderExerciseViewModel(private val exerciseDataRepository: ExerciseDataRe
         var newDifficultLevel = exerciseData.levelData.difficultLevel
         var newStep = 0
         var newLength = nextSliderType?.length
+        var newSuccessTime: Long
 
         if (exerciseData.levelData.difficultLevel == 1 && exerciseData.levelData.step < 1) {
             newStep = exerciseData.levelData.step + 1
@@ -110,9 +118,6 @@ class SliderExerciseViewModel(private val exerciseDataRepository: ExerciseDataRe
             newDifficultLevel++
             newDifficultName = nextSliderType!!.name
         }
-        // TODO timer
-        val newSuccessTime = 0L
-
 
         // New Random Coords
         var newStartX = 0
@@ -135,6 +140,9 @@ class SliderExerciseViewModel(private val exerciseDataRepository: ExerciseDataRe
         } else if (exerciseData.levelData.difficultLevel == 3) {
             newAngle = 90f
         }
+
+        endTime = System.currentTimeMillis()
+        newSuccessTime = endTime - startTime
 
         val newExerciseData = ExcersizeData(
             excersizeType = newExerciseType,
@@ -171,6 +179,14 @@ class SliderExerciseViewModel(private val exerciseDataRepository: ExerciseDataRe
     private fun closeActivity() {
         viewModelScope.launch {
             _closeActivityEvent.emit(Unit)
+        }
+    }
+
+    fun startTimer() {
+        startTime = System.currentTimeMillis()
+        timerJob = viewModelScope.launch {
+            delay(20000)
+            saveNewStatsAndCloseActivity(ResultValue.UNSUCCESS)
         }
     }
 }

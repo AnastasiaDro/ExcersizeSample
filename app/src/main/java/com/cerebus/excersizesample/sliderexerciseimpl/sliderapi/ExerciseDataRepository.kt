@@ -18,8 +18,6 @@ private const val EXERCISE_DIFFICULT_NAME = "excersize_difficult_name"
 private const val EXERCISE_STEP = "excersize_step"
 private const val EXERCISE_SUCCESS_TIME = "excersize_success_time"
 
-private const val IS_SLIDER_IN_PROGRESS = "is_slider_in_progress"
-
 private const val SLIDER_NAME = "slider_name"
 private const val SLIDER_LENGTH = "slider_length"
 private const val SLIDER_ANGLE = "slider_angle"

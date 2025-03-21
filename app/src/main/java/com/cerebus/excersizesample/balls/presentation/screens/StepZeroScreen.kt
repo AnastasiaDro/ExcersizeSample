@@ -35,7 +35,6 @@ fun StepZeroScreen(
 ) {
     var isShow by remember { mutableStateOf(true) }
     LaunchedEffect(Unit) {
-        Log.d("qaz", "showBall")
         viewModel.updateStartTime(System.currentTimeMillis())
     }
 
@@ -98,4 +97,5 @@ fun StepZeroScreen(
         }
     }
 }
+
 

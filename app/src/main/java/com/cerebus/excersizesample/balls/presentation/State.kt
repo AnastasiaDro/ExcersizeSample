@@ -4,6 +4,15 @@ import androidx.compose.ui.graphics.Color
 import com.cerebus.excersizesample.api.ResultValue
 import com.cerebus.excersizesample.balls.AllConstants
 
+    data class Ball(
+        val id: Int, // Уникальный идентификатор шарика
+        val x: Float, // Координата X центра шарика
+        val y: Float, // Координата Y центра шарика
+        val radius: Float, // Радиус шарика
+        val color: Color,
+        var isVisible: Boolean = true // Видим ли шарик
+    )
+
 data class BallsUiItems(
     val circleRadius: Float = 200.0f, // радиус
     val circleColor: Color, // цвет шара
@@ -12,14 +21,14 @@ data class BallsUiItems(
     val crossThickness: Float = 10f, // Толщина линий крестика
 )
 
+
+
 // GameState - это текущее состояние игры
 data class GameState (
     val difficultLevel: Int = 0,
     val difficultName : String = "Static Ball",//у каждого упражнения есть сложность, например, тстаичные шарики - это сложность 0,  // двигающиеся - сложность 2
     val step: Int = 0, // шаг во время сложности, то есть 1 шарик - ноль, два шарика - 1, 3 шарика - 2
     val successTime: Long = AllConstants.TIME_FOR_SUCCESS_STEP_0_1, // время в миллисекундах, при котором мы считаем упражнение успешно выполненным FULL_SUCCESS
-//    val isShowBall : Boolean = true, // шарик показан или нет
-    val numberOfBalls : Int = 1, // число шариков на экране
     val numberBallsAll : Int = 1,
     val startTime: Long = 0L,  // Время начала игры
     val timeGameFinished :  Long = 0L, // за сколько секунд завершен уровень
@@ -34,7 +43,6 @@ data class LastGameParams(
     val step: Int = 0, // шаг сложности (уровень) нужно запустить, от 0 до 3 согласно ТЗ
     val isGameSucceedStatus : ResultValue = ResultValue.UNSUCCESS, // уровень успешно завершен за нужное время
     val timeGameFinished : Long = 0L, // за сколько секунд завершен уровень
-//    val gameSucceedTimes : Int = 0, // сколько раз игра была успешно сыграна до последнего уровня (?)
     val lastSucceedTime: Long = 0L, // System.currentTimeMillis()
 )
 

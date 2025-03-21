@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class BallsViewModel(private val context: Context) : ViewModel() {
+class BallsViewModel(context: Context) : ViewModel() {
     private val sharedPreferences =
         context.getSharedPreferences("GamePreferences", Context.MODE_PRIVATE)
     private val _state: MutableStateFlow<GameState> = MutableStateFlow(GameState())
@@ -23,12 +23,6 @@ class BallsViewModel(private val context: Context) : ViewModel() {
 
     private val _closeActivityEvent = MutableSharedFlow<Unit>()
     val closeActivityEvent: SharedFlow<Unit> = _closeActivityEvent
-
-    private fun closeActivity() {
-        viewModelScope.launch {
-            _closeActivityEvent.emit(Unit)
-        }
-    }
 
     // Функция для сохранения данных в sharedPref
     fun saveLastGameParams(params: LastGameParams) {
@@ -82,65 +76,23 @@ class BallsViewModel(private val context: Context) : ViewModel() {
         saveLastGameParams(newData)
     }
 
-    fun endOfZeroAndOneLevel() {
+    fun endOfLevel() {
         val levelFinishedInTime = checkTimeSuccess()
         if (levelFinishedInTime) {
-            _state.update {
-                it.copy(
-                    gameResultValue = ResultValue.FULL_SUCCESS,
-                )
-            }
+            _state.update { it.copy(gameResultValue = ResultValue.FULL_SUCCESS) }
         } else {
-            _state.update {
-                it.copy(
-                    gameResultValue = ResultValue.PART_SUCCESS,
-                )
-            }
+            _state.update { it.copy(gameResultValue = ResultValue.PART_SUCCESS) }
         }
         changeDataInSharedPref()
     }
-
-    fun endOfOneLevel() {
-        val levelFinishedInTime = checkTimeSuccess()
-        if (levelFinishedInTime) {
-            _state.update {
-                it.copy(
-                    gameResultValue = ResultValue.FULL_SUCCESS,
-                )
-            }
-        } else {
-            _state.update {
-                it.copy(
-                    gameResultValue = ResultValue.PART_SUCCESS,
-                )
-            }
-        }
-        changeDataInSharedPref()
-        closeActivity()
-    }
-
 
     fun ballClicked() {
-        /*тут считаем количество шариков
-        если все шарики нажаты едем дальше
-         */
-
-        // if (шариков нет)
-        when (state.value.step) {
-            0 -> {
-                endOfZeroAndOneLevel()
-            }
-            1 -> {
-                endOfZeroAndOneLevel()
-            }
-
-            2 -> {}
-            3 -> {}
+        val newNumber = state.value.numberBallsAll - 1
+        _state.update { it.copy(numberBallsAll = newNumber) }
+        if (state.value.numberBallsAll == 0) {
+            endOfLevel()
+            closeActivity()
         }
-        closeActivity()
-        // переписать завершение активити!!
-//                (context as? Activity)?.finish() // херня какая-то, но я спать хочу уже
-
         /* шарик нажат, проверяем сколько шариков осталось нажать
     если шариков нет -> то вызыем checkData ()
     в checkData проверяем  текущие значения игры с референсными 4
@@ -150,29 +102,27 @@ class BallsViewModel(private val context: Context) : ViewModel() {
      */
     }
 
+    private fun closeActivity() {
+        viewModelScope.launch {
+            _closeActivityEvent.emit(Unit)
+        }
+    }
+
     fun levelDataUpdate(level: Int) {
         when (level) {
             0 -> {
-                _state.update {
-                    it.copy(
-                        difficultLevel = 0,
-                        difficultName = "Static",
+                _state.update { it.copy(
                         step = 0,
                         successTime = AllConstants.TIME_FOR_SUCCESS_STEP_0_1,
-//                        numberOfBalls = 1,
                         numberBallsAll = 1,
                     )
                 }
             }
 
             1 -> {
-                _state.update {
-                    it.copy(
-                        difficultLevel = 0,
-                        difficultName = "Static",
+                _state.update { it.copy(
                         step = 1,
                         successTime = AllConstants.TIME_FOR_SUCCESS_STEP_0_1,
-//                        numberOfBalls = 1,
                         numberBallsAll = 1,
                     )
                 }
@@ -181,32 +131,23 @@ class BallsViewModel(private val context: Context) : ViewModel() {
             2 -> {
                 _state.update {
                     it.copy(
-                        difficultLevel = 0,
-                        difficultName = "Static",
                         step = 2,
                         successTime = AllConstants.TIME_FOR_SUCCESS_STEP_2_3,
-//                        numberOfBalls = 1,
                         numberBallsAll = 2,
                     )
                 }
             }
 
             3 -> {
+                Log.d("qaz", "update like 3")
                 _state.update {
                     it.copy(
-                        difficultLevel = 0,
-                        difficultName = "Static",
                         step = 3,
                         successTime = AllConstants.TIME_FOR_SUCCESS_STEP_2_3,
-//                        numberOfBalls = 1,
                         numberBallsAll = 3,
                     )
                 }
             }
         }
-        Log.d(
-            "qaz", "GameData For level ${state.value.step}: " +
-                    "sucTime : ${state.value.successTime}, ballsAll: ${state.value.numberBallsAll} "
-        )
     }
 }

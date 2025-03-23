@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -60,38 +61,19 @@ fun StepZeroScreen(
             },
         contentAlignment = Alignment.Center
     ) {
-        if (isShow == true) {
+        if (isShow) {
             Canvas(modifier = Modifier.fillMaxWidth()) {
-                val centerX = size.width / 2
-                val centerY = size.height / 2
+                val center = Offset(size.width / 2, size.height / 2)
                 drawCircle(
                     color = ballsUiItems.circleColor,
                     radius = ballsUiItems.circleRadius,
-                    center = Offset(size.width / 2, size.height / 2)
+                    center = center
                 )
-                drawLine(
-                    color = ballsUiItems.crossColor,
-                    start = Offset(
-                        centerX - ballsUiItems.crossLength / 2,
-                        centerY - ballsUiItems.crossLength / 2
-                    ),
-                    end = Offset(
-                        centerX + ballsUiItems.crossLength / 2,
-                        centerY + ballsUiItems.crossLength / 2
-                    ),
-                    strokeWidth = ballsUiItems.crossThickness
-                )
-                drawLine(
-                    color = ballsUiItems.crossColor,
-                    start = Offset(
-                        centerX - ballsUiItems.crossLength / 2,
-                        centerY + ballsUiItems.crossLength / 2
-                    ),
-                    end = Offset(
-                        centerX + ballsUiItems.crossLength / 2,
-                        centerY - ballsUiItems.crossLength / 2
-                    ),
-                    strokeWidth = ballsUiItems.crossThickness
+                drawCircle(
+                    color = ballsUiItems.borderColor,
+                    radius = ballsUiItems.circleRadius, // Радиус обводки больше радиуса шара
+                    center = center,
+                    style = Stroke(width = ballsUiItems.borderThickness) // Устанавливаем стиль обводки
                 )
             }
         }

@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -64,6 +65,7 @@ fun StepOneScreen(
             },
         contentAlignment = Alignment.Center
     ) {
+
         if (isShow) {
             Canvas(modifier = Modifier.fillMaxSize()) {
                 val width = size.width.toFloat()
@@ -76,29 +78,11 @@ fun StepOneScreen(
                     radius = ballsUiItems.circleRadius,
                     center = circleCenter
                 )
-                drawLine(
-                    color = ballsUiItems.crossColor,
-                    start = Offset(
-                        circleCenter.x - ballsUiItems.crossLength / 2,
-                        circleCenter.y - ballsUiItems.crossLength / 2
-                    ),
-                    end = Offset(
-                        circleCenter.x + ballsUiItems.crossLength / 2,
-                        circleCenter.y + ballsUiItems.crossLength / 2
-                    ),
-                    strokeWidth = ballsUiItems.crossThickness
-                )
-                drawLine(
-                    color = ballsUiItems.crossColor,
-                    start = Offset(
-                        circleCenter.x - ballsUiItems.crossLength / 2,
-                        circleCenter.y + ballsUiItems.crossLength / 2
-                    ),
-                    end = Offset(
-                        circleCenter.x + ballsUiItems.crossLength / 2,
-                        circleCenter.y - ballsUiItems.crossLength / 2
-                    ),
-                    strokeWidth = ballsUiItems.crossThickness
+                drawCircle(
+                    color = ballsUiItems.borderColor,
+                    radius = ballsUiItems.circleRadius, // Радиус обводки больше радиуса шара
+                    center = circleCenter,
+                    style = Stroke(width = ballsUiItems.borderThickness) // Устанавливаем стиль обводки
                 )
             }
         }

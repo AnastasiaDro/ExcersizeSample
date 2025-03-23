@@ -16,9 +16,9 @@ import com.cerebus.excersizesample.balls.AllConstants
 data class BallsUiItems(
     val circleRadius: Float = 200.0f, // радиус
     val circleColor: Color, // цвет шара
-    val crossColor: Color = Color.Black,
+    val borderColor: Color = Color.DarkGray, // обводка
     val crossLength: Float = circleRadius * 1f, // Длина линий крестика
-    val crossThickness: Float = 10f, // Толщина линий крестика
+    val borderThickness: Float = 10f, // Толщина линий обводки
 )
 
 

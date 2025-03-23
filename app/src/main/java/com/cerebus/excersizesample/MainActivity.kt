@@ -1,7 +1,6 @@
 package com.cerebus.excersizesample
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -38,29 +37,13 @@ class MainActivity : ComponentActivity() {
         }
         if (step > MAX_LEVEL_IN_GAME)
             step = 0
+        viewModel.levelDataUpdate(step)
         setContent {
             when (step) {
-                0 -> {
-                    viewModel.levelDataUpdate(0)
-                    StepZeroScreen(viewModel)
-                }
-
-                1 -> {
-                    viewModel.levelDataUpdate(1)
-                    StepOneScreen(viewModel)
-                }
-
-                2 -> {
-                    Log.d("qaz", "2 'экран")
-                    viewModel.levelDataUpdate(2)
-                    StepTwoScreen(viewModel)
-                }
-
-                3 -> {
-                    Log.d("qaz", "3 экран")
-                    viewModel.levelDataUpdate(3)
-                    StepThreeScreen(viewModel)
-                }
+                0 -> { StepZeroScreen(viewModel) }
+                1 -> { StepOneScreen(viewModel) }
+                2 -> { StepTwoScreen(viewModel) }
+                3 -> { StepThreeScreen(viewModel) }
             }
         }
     }

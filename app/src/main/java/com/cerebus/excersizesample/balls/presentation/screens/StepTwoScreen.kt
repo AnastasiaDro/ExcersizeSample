@@ -1,8 +1,8 @@
 package com.cerebus.excersizesample.balls.presentation.screens
 
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -18,28 +18,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.cerebus.excersizesample.R
 import com.cerebus.excersizesample.balls.presentation.BallsViewModel
 import kotlin.random.Random
 
 @Composable
 fun RoundImageButton(color: Color, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val borderColor = Color.DarkGray
+    val borderWith = 5.dp
     IconButton(
         onClick = onClick,
         modifier = modifier
             .size(100.dp)
             .background(color, CircleShape)
+            .border(shape = CircleShape, color = borderColor, width = borderWith)
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.black_cross), // Замените на ваш ресурс изображения
-            contentDescription = null,
-            modifier = Modifier.size(150.dp),
-            contentScale = ContentScale.Crop
-        )
     }
 }
 
@@ -55,7 +49,8 @@ fun StepTwoScreen(viewModel: BallsViewModel) {
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
     // Генерация случайных позиций для кнопок при инициализации
-    val buttonOnePosition by remember { mutableStateOf(
+    val buttonOnePosition by remember {
+        mutableStateOf(
             Offset(
                 x = random.nextInt(screenWidth.value.toInt() - 100).toFloat(),
                 y = random.nextInt(screenHeight.value.toInt() - 100).toFloat()
@@ -84,7 +79,8 @@ fun StepTwoScreen(viewModel: BallsViewModel) {
                 color = Color.Blue,
                 onClick = {
                     isOneButtonVisible = false
-                          viewModel.ballClicked()},
+                    viewModel.ballClicked()
+                },
                 modifier = Modifier.offset(
                     x = buttonOnePosition.x.dp,
                     y = buttonOnePosition.y.dp
@@ -98,7 +94,8 @@ fun StepTwoScreen(viewModel: BallsViewModel) {
                 color = Color.Green,
                 onClick = {
                     isTwoButtonVisible = false
-                    viewModel.ballClicked()},
+                    viewModel.ballClicked()
+                },
                 modifier = Modifier.offset(
                     x = buttonTwoPosition.x.dp,
                     y = buttonTwoPosition.y.dp
